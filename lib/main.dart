@@ -128,11 +128,17 @@ class ListaContatos extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color.fromRGBO(0, 56, 168, 1.0),
         onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => FormularioContatos(),
-            ),
-          );
+          Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => FormularioContatos(),
+                ),
+              )
+              .then(
+                (novoContato) => debugPrint(
+                  novoContato.toString(),
+                ),
+              );
         },
         child: Icon(
           Icons.add,
@@ -146,7 +152,7 @@ class ListaContatos extends StatelessWidget {
 
 class FormularioContatos extends StatefulWidget {
   FormularioContatos({super.key});
-  
+
   @override
   _FormularioContatoState createState() => _FormularioContatoState();
 }
@@ -179,6 +185,7 @@ class _FormularioContatoState extends State<FormularioContatos> {
         child: Column(
           children: [
             TextField(
+              controller: _controladorNome,
               decoration: InputDecoration(
                 labelText: 'Nome completo',
               ),
@@ -187,6 +194,7 @@ class _FormularioContatoState extends State<FormularioContatos> {
               ),
             ),
             TextField(
+              controller: _controladorNumeroConta,
               decoration: InputDecoration(
                 labelText: 'Número da conta',
               ),
@@ -215,7 +223,11 @@ class _FormularioContatoState extends State<FormularioContatos> {
                     ),
                   ),
                   onPressed: () {
-                    print('salvou');
+                    final String nome = _controladorNome.text;
+                    final int? numeroConta =
+                        int.tryParse(_controladorNumeroConta.text);
+                    final Contato novoContato = Contato(nome, numeroConta);
+                    Navigator.pop(context, novoContato);
                   },
                 ),
               ),
@@ -224,5 +236,17 @@ class _FormularioContatoState extends State<FormularioContatos> {
         ),
       ),
     );
+  }
+}
+
+class Contato {
+  final String nome;
+  final numeroConta;
+
+  Contato(this.nome, this.numeroConta);
+
+  @override
+  String toString() {
+    return 'Contato{nome: $nome, numeroConta: ${numeroConta}}';
   }
 }
