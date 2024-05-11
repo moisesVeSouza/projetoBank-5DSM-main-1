@@ -45,7 +45,7 @@ class Dashboard extends StatelessWidget {
           children: [
             Image.network(
                 'https://asbraf.com/wp-content/uploads/2020/04/bb3.png'),
-            GestureDetector( 
+            GestureDetector(
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -127,11 +127,100 @@ class ListaContatos extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color.fromRGBO(0, 56, 168, 1.0),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => FormularioContatos(),
+            ),
+          );
+        },
         child: Icon(
           Icons.add,
           color: Colors.white,
           size: 35.0,
+        ),
+      ),
+    );
+  }
+}
+
+class FormularioContatos extends StatefulWidget {
+  FormularioContatos({super.key});
+  
+  @override
+  _FormularioContatoState createState() => _FormularioContatoState();
+}
+
+class _FormularioContatoState extends State<FormularioContatos> {
+  final TextEditingController _controladorNome = TextEditingController();
+  final TextEditingController _controladorNumeroConta = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromRGBO(
+          0,
+          56,
+          168,
+          1.0,
+        ),
+        title: Text(
+          'Novo contato',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Nome completo',
+              ),
+              style: TextStyle(
+                fontSize: 24.0,
+              ),
+            ),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Número da conta',
+              ),
+              style: TextStyle(
+                fontSize: 24.0,
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: double.maxFinite,
+                child: ElevatedButton(
+                  child: Text(
+                    'Salvar',
+                    style: TextStyle(fontSize: 20.0, color: Colors.white),
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      Color.fromRGBO(
+                        0,
+                        56,
+                        168,
+                        1.0,
+                      ),
+                    ),
+                  ),
+                  onPressed: () {
+                    print('salvou');
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
