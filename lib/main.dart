@@ -1,7 +1,16 @@
+import 'package:bank/app_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-void main() => runApp(BankApp());
+void main() {
+  runApp(BankApp());
+  save(Contato(0, 'moises', 1234)).then((id){
+    findAll().then((contatos) => debugPrint(contatos.toString()
+        )
+      );
+    }
+  );
+}
 
 class BankApp extends StatelessWidget {
   const BankApp({super.key});
@@ -128,17 +137,11 @@ class ListaContatos extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color.fromRGBO(0, 56, 168, 1.0),
         onPressed: () {
-          Navigator.of(context)
-              .push(
-                MaterialPageRoute(
-                  builder: (context) => FormularioContatos(),
-                ),
-              )
-              .then(
-                (novoContato) => debugPrint(
-                  novoContato.toString(),
-                ),
-              );
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => FormularioContatos(),
+            ),
+          ).then((novoContato) => debugPrint(novoContato.toString()));
         },
         child: Icon(
           Icons.add,
@@ -154,10 +157,11 @@ class FormularioContatos extends StatefulWidget {
   FormularioContatos({super.key});
 
   @override
-  _FormularioContatoState createState() => _FormularioContatoState();
+  _FormularioContatosState createState() => _FormularioContatosState();
+  
 }
 
-class _FormularioContatoState extends State<FormularioContatos> {
+class _FormularioContatosState extends State<FormularioContatos> {
   final TextEditingController _controladorNome = TextEditingController();
   final TextEditingController _controladorNumeroConta = TextEditingController();
 
@@ -172,7 +176,7 @@ class _FormularioContatoState extends State<FormularioContatos> {
           1.0,
         ),
         title: Text(
-          'Novo contato',
+          'Novo Contato',
           style: TextStyle(
             color: Colors.white,
             fontSize: 30,
@@ -187,7 +191,7 @@ class _FormularioContatoState extends State<FormularioContatos> {
             TextField(
               controller: _controladorNome,
               decoration: InputDecoration(
-                labelText: 'Nome completo',
+                labelText: 'Nome Completo',
               ),
               style: TextStyle(
                 fontSize: 24.0,
@@ -196,7 +200,7 @@ class _FormularioContatoState extends State<FormularioContatos> {
             TextField(
               controller: _controladorNumeroConta,
               decoration: InputDecoration(
-                labelText: 'Número da conta',
+                labelText: 'Número da Conta',
               ),
               style: TextStyle(
                 fontSize: 24.0,
@@ -204,31 +208,28 @@ class _FormularioContatoState extends State<FormularioContatos> {
               keyboardType: TextInputType.number,
             ),
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: SizedBox(
                 width: double.maxFinite,
                 child: ElevatedButton(
-                  child: Text(
-                    'Salvar',
-                    style: TextStyle(fontSize: 20.0, color: Colors.white),
-                  ),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(
-                      Color.fromRGBO(
-                        0,
-                        56,
-                        168,
-                        1.0,
-                      ),
+                      Color.fromRGBO(0, 56, 168, 1.0),
                     ),
                   ),
                   onPressed: () {
                     final String nome = _controladorNome.text;
-                    final int? numeroConta =
-                        int.tryParse(_controladorNumeroConta.text);
-                    final Contato novoContato = Contato(nome, numeroConta);
+                    final int? numeroConta = int.tryParse(_controladorNumeroConta.text);
+                    final Contato novoContato = Contato(0, nome, numeroConta);
                     Navigator.pop(context, novoContato);
                   },
+                  child: Text(
+                    'Salvar',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -239,14 +240,18 @@ class _FormularioContatoState extends State<FormularioContatos> {
   }
 }
 
+
+
 class Contato {
+  final int id; 
   final String nome;
-  final numeroConta;
+  final int? numeroConta;
 
-  Contato(this.nome, this.numeroConta);
 
-  @override
-  String toString() {
-    return 'Contato{nome: $nome, numeroConta: ${numeroConta}}';
+  Contato(this.id, this.nome, this.numeroConta);
+
+  @override 
+  String toString(){
+    return 'Contato{id: $id, nome: $nome, numeroConta: $numeroConta}';
   }
 }
