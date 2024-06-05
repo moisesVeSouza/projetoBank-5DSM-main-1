@@ -3,12 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 void main() {
-  runApp(BankApp());
-  save(Contato(0, 'moises', 1234)).then((id){
-    findAll().then((contatos) => debugPrint(contatos.toString()
-        )
-      );
-    }
+  runApp(
+    BankApp(),
   );
 }
 
@@ -94,12 +90,16 @@ class Dashboard extends StatelessWidget {
   }
 }
 
-class ListaContatos extends StatelessWidget {
-  const ListaContatos({super.key});
+class ListaContatos extends StatefulWidget {
+  ListaContatos({super.key});
 
   @override
+  _ContatosListaState createState() => _ContatosListaState();
+}
+
+class _ContatosListaState extends State<ListaContatos> {
+  @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(
@@ -117,31 +117,56 @@ class ListaContatos extends StatelessWidget {
           ),
         ),
       ),
-      body: ListView(
-        padding: EdgeInsets.all(8.0),
-        children: const [
-          Card(
-            child: ListTile(
-              title: Text(
-                'Alexandre',
-                style: TextStyle(fontSize: 24.0),
-              ),
-              subtitle: Text(
-                '1000',
-                style: TextStyle(fontSize: 16.0),
-              ),
-            ),
-          ),
-        ],
+      body: FutureBuilder(
+        initialData: const [],
+        future: Future.delayed(Duration(seconds: 1)).then((value) => findAll()),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              break;
+
+            case ConnectionState.waiting:
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const <Widget>[
+                    CircularProgressIndicator(),
+                    Text("Loading"),
+                  ],
+                ),
+              );
+              break;
+
+            case ConnectionState.active:
+              break;
+
+            case ConnectionState.done:
+              final List<Contato> contatos = snapshot.data as List<Contato>;
+              return ListView.builder(
+                itemBuilder: (context, index) {
+                  final Contato contato = contatos[index];
+                  return _ContatoItem(contato);
+                },
+                itemCount: contatos.length,
+              );
+              break;
+          }
+          return Text("Unkown error");
+        },
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color.fromRGBO(0, 56, 168, 1.0),
         onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => FormularioContatos(),
-            ),
-          ).then((novoContato) => debugPrint(novoContato.toString()));
+          Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => FormularioContatos(),
+                ),
+              )
+              .then(
+                (value) => setState(() {}),
+              );
         },
         child: Icon(
           Icons.add,
@@ -158,7 +183,6 @@ class FormularioContatos extends StatefulWidget {
 
   @override
   _FormularioContatosState createState() => _FormularioContatosState();
-  
 }
 
 class _FormularioContatosState extends State<FormularioContatos> {
@@ -219,9 +243,11 @@ class _FormularioContatosState extends State<FormularioContatos> {
                   ),
                   onPressed: () {
                     final String nome = _controladorNome.text;
-                    final int? numeroConta = int.tryParse(_controladorNumeroConta.text);
+                    final int? numeroConta =
+                        int.tryParse(_controladorNumeroConta.text);
                     final Contato novoContato = Contato(0, nome, numeroConta);
-                    Navigator.pop(context, novoContato);
+                    save(novoContato)
+                        .then((id) => Navigator.pop(context, novoContato));
                   },
                   child: Text(
                     'Salvar',
@@ -240,18 +266,36 @@ class _FormularioContatosState extends State<FormularioContatos> {
   }
 }
 
-
-
 class Contato {
-  final int id; 
+  final int id;
   final String nome;
   final int? numeroConta;
 
-
   Contato(this.id, this.nome, this.numeroConta);
 
-  @override 
-  String toString(){
+  @override
+  String toString() {
     return 'Contato{id: $id, nome: $nome, numeroConta: $numeroConta}';
+  }
+}
+
+class _ContatoItem extends StatelessWidget {
+  final Contato contato;
+  _ContatoItem(this.contato);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        title: Text(
+          contato.nome,
+          style: TextStyle(fontSize: 24.0),
+        ),
+        subtitle: Text(
+          contato.numeroConta.toString(),
+          style: TextStyle(fontSize: 16.0),
+        ),
+      ),
+    );
   }
 }
